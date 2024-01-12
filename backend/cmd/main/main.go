@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"backend/internal/websockets"
+	"net/http"
 )
 
 func main() {
-    fmt.Println("Starting Go backend...")
-
-    // Your HTTP server setup goes here
+    http.HandleFunc("/ws", websockets.HandleConnection)
+    http.ListenAndServe(":8080", nil)
 }
