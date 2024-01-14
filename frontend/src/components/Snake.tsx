@@ -34,30 +34,13 @@ const SnakeHeadStyle = ({ position, direction }: SnakeHeadStyleProps) => {
     left: `${x}px`,
     bottom: `${y}px`,
     transform: `rotate(${deg}deg)`,
-    borderLeft: '15px solid transparent',
-    borderRight: '15px solid transparent',
-    borderBottom: '30px solid #326432',
+    borderLeft: '14px solid transparent',
+    borderRight: '14px solid transparent',
+    borderBottom: '28px solid #326432',
+    margin: '1px',
     position: 'absolute',
   };
   return <div style={style}></div>;
-};
-
-const getDirection = () => {
-  const headDirection = generatePosition(3);
-  let direction = '';
-  switch (headDirection) {
-    case 0:
-      direction = 'up';
-    case 1:
-      direction = 'right';
-    case 2:
-      direction = 'down';
-    case 3:
-      direction = 'left';
-    default:
-      direction = 'up';
-  }
-  return direction;
 };
 
 const SnakeSegmentStyle = ({ position }) => {
@@ -79,12 +62,11 @@ const SnakeSegmentStyle = ({ position }) => {
 const SnakeSegment = ({ position, direction }) => {
   const segments = useSignal([]);
   const arr = [...Array(3).keys()];
-  console.log(direction, 'DIRECTION');
-  const updateSegment = (x, y) => {
+  const updateSegment = (x: number, y: number) => {
     segments.value.push({ x, y });
   };
 
-  const updatePosition = (offset, axis) => {
+  const updatePosition = (offset: number, axis: 'x' | 'y') => {
     arr.forEach((_, idx) => {
       const coord = position.value[axis] + offset * (idx + 1);
       updateSegment(
