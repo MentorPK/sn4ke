@@ -1,6 +1,6 @@
-import { Signal, useSignal, useSignalEffect } from '@preact/signals';
-import generatePosition from '../functions/generateRandomNumber';
-
+import { Signal, signal, useSignal, useSignalEffect } from '@preact/signals';
+import generateRandomNumber from '../functions/generateRandomNumber';
+import { motion } from 'framer-motion';
 type Position = {
   x: number;
   y: number;
@@ -10,7 +10,7 @@ type FoodStyleProps = {
   onClick: () => void;
 };
 
-const FoodStyle = ({ position, onClick }: FoodStyleProps) => {
+const FoodStyle = ({ position }: FoodStyleProps) => {
   const x = position.value.x * 30;
   const y = position.value.y * 30;
   const style = {
@@ -22,18 +22,28 @@ const FoodStyle = ({ position, onClick }: FoodStyleProps) => {
     borderRadius: '50%',
     position: 'absolute',
   };
-  return <div style={style} onClick={onClick} />;
+  return (
+    <motion.div
+      style={style}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    />
+  );
 };
 
-const Food = () => {
-  const foodPosition = useSignal({ x: 0, y: 0 });
+export const foodPosition = signal({ x: 0, y: 0 });
 
-  const xPos = generatePosition(19);
-  const yPos = generatePosition(19);
+const Food = () => {
+  const xPos = generateRandomNumber(19);
+  const yPos = generateRandomNumber(19);
   foodPosition.value = { x: xPos, y: yPos };
 
   const handleFoodClick = () => {
-    foodPosition.value = { x: generatePosition(19), y: generatePosition(19) };
+    foodPosition.value = {
+      x: generateRandomNumber(19),
+      y: generateRandomNumber(19),
+    };
   };
 
   return <FoodStyle position={foodPosition} onClick={handleFoodClick} />;

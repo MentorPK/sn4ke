@@ -1,7 +1,8 @@
-import { batch, useSignal, useSignalEffect } from '@preact/signals';
+import { batch, computed, useSignal, useSignalEffect } from '@preact/signals';
 import generateRandomNumber from '../functions/generateRandomNumber';
 import { useEffect } from 'preact/hooks';
 import { SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
+import { foodPosition } from './Food';
 
 const Snake = () => {
   const snakeHead = useSignal({ x: 0, y: 0 });
@@ -65,6 +66,47 @@ const Snake = () => {
     }
   };
 
+  const eatFood = () => {
+    const eating =
+      snakeHead.value.x === foodPosition.value.x &&
+      snakeHead.value.y === foodPosition.value.y
+        ? true
+        : false;
+    console.log(eating, 'wat2');
+    if (eating) {
+      const updateSegment = (x: number, y: number) => {
+        segments.value = [...segments.value, { x, y }];
+      };
+
+      const growSnake = (offset: number, axis: 'x' | 'y') => {
+        const length = segments.value.length;
+        if (length > 0) {
+          const lastSegment = segments.value[length - 1];
+          const coord = lastSegment[axis] + offset;
+          updateSegment(
+            axis === 'x' ? coord : lastSegment.x,
+            axis === 'y' ? coord : lastSegment.y
+          );
+        }
+      };
+      if (direction.value === 0) {
+        growSnake(-1, 'y');
+      } else if (direction.value === 1) {
+        growSnake(-1, 'x');
+      } else if (direction.value === 2) {
+        growSnake(1, 'y');
+      } else {
+        growSnake(1, 'x');
+      }
+    }
+  };
+  useSignalEffect(() => {
+    console.log(foodPosition.value, snakeHead.value);
+  });
+  useEffect(() => {
+    eatFood();
+  }, [snakeHead.value, foodPosition.value]);
+
   const getInputKey = (e: KeyboardEvent) => {
     switch (e.key) {
       case 'w':
@@ -99,10 +141,6 @@ const Snake = () => {
         break;
     }
   };
-
-  useSignalEffect(() => {
-    console.log(snakeHead.value, segments.value);
-  });
 
   useEffect(() => {
     spawn();
