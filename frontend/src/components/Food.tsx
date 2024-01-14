@@ -1,5 +1,5 @@
 import { Signal, useSignal, useSignalEffect } from '@preact/signals';
-import generatePosition from '../functions/generatePosition';
+import generatePosition from '../functions/generateRandomNumber';
 
 type Position = {
   x: number;
@@ -28,16 +28,12 @@ const FoodStyle = ({ position, onClick }: FoodStyleProps) => {
 const Food = () => {
   const foodPosition = useSignal({ x: 0, y: 0 });
 
-  useSignalEffect(() => {
-    console.log(foodPosition.value, 'FOOD');
-  });
-
-  const xPos = generatePosition();
-  const yPos = generatePosition();
+  const xPos = generatePosition(19);
+  const yPos = generatePosition(19);
   foodPosition.value = { x: xPos, y: yPos };
 
   const handleFoodClick = () => {
-    foodPosition.value = { x: generatePosition(), y: generatePosition() };
+    foodPosition.value = { x: generatePosition(19), y: generatePosition(19) };
   };
 
   return <FoodStyle position={foodPosition} onClick={handleFoodClick} />;
