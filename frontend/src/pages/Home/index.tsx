@@ -1,10 +1,11 @@
-import { signal } from '@preact/signals';
+import { signal, useSignal, useSignalEffect } from '@preact/signals';
 
 import './style.css';
 import initializeWebSocket from '../../functions/initializeWebSocket';
 import Board from '../../components/Board';
 import Food from '../../components/Food';
 import Snake from '../../components/Snake';
+import { isGameOver, snakeHead } from '../../signals/globalSignals';
 
 export const Home = () => {
   // Create a signal for the WebSocket
@@ -19,8 +20,14 @@ export const Home = () => {
   return (
     <div>
       <Board>
-        <Snake />
-        <Food />
+        {isGameOver.value ? (
+          <h1>Game Over</h1>
+        ) : (
+          <>
+            <Snake />
+            <Food />
+          </>
+        )}
       </Board>
     </div>
   );

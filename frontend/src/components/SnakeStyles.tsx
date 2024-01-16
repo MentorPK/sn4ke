@@ -1,7 +1,7 @@
 import { Signal } from '@preact/signals';
 import { motion } from 'framer-motion';
 
-type Position = {
+export type Position = {
   x: number;
   y: number;
 };

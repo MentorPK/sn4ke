@@ -1,22 +1,23 @@
-import { batch, computed, useSignal, useSignalEffect } from '@preact/signals';
+import { batch, useSignal } from '@preact/signals';
 import generateRandomNumber from '../functions/generateRandomNumber';
 import { useEffect } from 'preact/hooks';
-import { SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
-import { foodPosition } from './Food';
+import { Position, SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
+import { spawnFood } from './Food';
+import { foodPosition, isGameOver, snakeHead } from '../signals/globalSignals';
 
 const Snake = () => {
-  const snakeHead = useSignal({ x: 0, y: 0 });
   //direction starts on 12 oclock with 0 top 1 on 3 oclock, 2 on 6, 3 on 9
-  const direction = useSignal(generateRandomNumber(3));
-  const segments = useSignal([]);
-  const spawn = () => {
+  const direction = useSignal<number>(generateRandomNumber(3));
+  const segments = useSignal<Position[]>([]);
+  const updateSegment = (x: number, y: number): void => {
+    segments.value = [...segments.value, { x, y }];
+  };
+  const spawn = (): void => {
     const snakeHeadX = generateRandomNumber(19);
     const snakeHeadY = generateRandomNumber(19);
     snakeHead.value = { x: snakeHeadX, y: snakeHeadY };
+
     const arr = [...Array(3).keys()];
-    const updateSegment = (x: number, y: number) => {
-      segments.value = [...segments.value, { x, y }];
-    };
 
     const updatePosition = (offset: number, axis: 'x' | 'y') => {
       arr.forEach((_, idx) => {
@@ -27,6 +28,7 @@ const Snake = () => {
         );
       });
     };
+
     if (direction.value === 0) {
       updatePosition(-1, 'y');
     } else if (direction.value === 1) {
@@ -38,7 +40,41 @@ const Snake = () => {
     }
   };
 
-  const move = () => {
+  const areSegmentsBehindBoard = (): boolean => {
+    return segments.value.some(
+      (segment) =>
+        segment.x <= 0 || segment.y <= 0 || segment.x >= 20 || segment.y >= 20
+    );
+  };
+
+  const respawn = (): void => {
+    do {
+      //updatePosition function is triggering infite loop because new segments are attached to the old one but never reseted after head spawns
+      segments.value = [];
+      spawn();
+    } while (areSegmentsBehindBoard());
+  };
+
+  const generateRandomNotOccupiedFoodPosition = (): void => {
+    do {
+      spawnFood();
+    } while (isFoodOccupyingSnakePosition());
+  };
+
+  const isFoodOccupyingSnakePosition = (): boolean => {
+    // Check if the position is occupied by the snake (head or segments)
+    return (
+      (foodPosition.value.x === snakeHead.value.x &&
+        foodPosition.value.y === snakeHead.value.y) ||
+      segments.value.some(
+        (segment) =>
+          segment.x === foodPosition.value.x &&
+          segment.y === foodPosition.value.y
+      )
+    );
+  };
+
+  const move = (): void => {
     const updateMovment = (offset: number, axis: 'x' | 'y') => {
       const coord = snakeHead.value[axis] + offset;
       batch(() => {
@@ -66,18 +102,13 @@ const Snake = () => {
     }
   };
 
-  const eatFood = () => {
+  const eatFood = (): void => {
     const eating =
       snakeHead.value.x === foodPosition.value.x &&
       snakeHead.value.y === foodPosition.value.y
         ? true
         : false;
-    console.log(eating, 'wat2');
     if (eating) {
-      const updateSegment = (x: number, y: number) => {
-        segments.value = [...segments.value, { x, y }];
-      };
-
       const growSnake = (offset: number, axis: 'x' | 'y') => {
         const length = segments.value.length;
         if (length > 0) {
@@ -87,6 +118,7 @@ const Snake = () => {
             axis === 'x' ? coord : lastSegment.x,
             axis === 'y' ? coord : lastSegment.y
           );
+          generateRandomNotOccupiedFoodPosition();
         }
       };
       if (direction.value === 0) {
@@ -100,41 +132,52 @@ const Snake = () => {
       }
     }
   };
-  useSignalEffect(() => {
-    console.log(foodPosition.value, snakeHead.value);
-  });
-  useEffect(() => {
-    eatFood();
-  }, [snakeHead.value, foodPosition.value]);
 
-  const getInputKey = (e: KeyboardEvent) => {
+  const isHeadEatingSegment = () => {
+    const eaten = segments.value.some(
+      (segment) =>
+        segment.x === snakeHead.value.x && segment.y === snakeHead.value.y
+    );
+    if (eaten) {
+      isGameOver.value = true;
+    }
+  };
+
+  const handleGameOver = (): void => {
+    if (
+      snakeHead.value.x < 0 ||
+      snakeHead.value.x >= 20 || // Assuming the board size is 20x20
+      snakeHead.value.y < 0 ||
+      snakeHead.value.y >= 20
+    ) {
+      isGameOver.value = true;
+    }
+  };
+
+  const getInputKey = (e: KeyboardEvent): void => {
     switch (e.key) {
       case 'w':
       case 'ArrowUp':
         if (direction.value !== 2) {
           direction.value = 0;
-          move();
         }
         break;
       case 's':
       case 'ArrowDown':
         if (direction.value !== 0) {
           direction.value = 2;
-          move();
         }
         break;
       case 'a':
       case 'ArrowLeft':
         if (direction.value !== 1) {
           direction.value = 3;
-          move();
         }
         break;
       case 'd':
       case 'ArrowRight':
         if (direction.value !== 3) {
           direction.value = 1;
-          move();
         }
         break;
       default:
@@ -142,11 +185,26 @@ const Snake = () => {
     }
   };
 
+  const startMoving = (): number => {
+    const interval = setInterval(() => {
+      move();
+    }, 1000);
+    return interval;
+  };
+
   useEffect(() => {
-    spawn();
+    eatFood();
+    handleGameOver();
+    isHeadEatingSegment();
+  }, [snakeHead.value]);
+
+  useEffect(() => {
+    respawn();
+    const movingInterval = startMoving();
     document.addEventListener('keydown', getInputKey);
     return () => {
       document.removeEventListener('keydown', getInputKey);
+      clearInterval(movingInterval);
     };
   }, []);
 
