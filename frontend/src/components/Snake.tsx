@@ -3,12 +3,18 @@ import generateRandomNumber from '../functions/generateRandomNumber';
 import { useEffect } from 'preact/hooks';
 import { Position, SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
 import { spawnFood } from './Food';
-import { foodPosition, isGameOver, snakeHead } from '../signals/globalSignals';
+import {
+  foodPosition,
+  isGameOver,
+  snakeHead,
+  speed,
+} from '../signals/globalSignals';
 
 const Snake = () => {
   //direction starts on 12 oclock with 0 top 1 on 3 oclock, 2 on 6, 3 on 9
   const direction = useSignal<number>(generateRandomNumber(3));
   const segments = useSignal<Position[]>([]);
+  const triggerdDirection = useSignal<boolean>(false);
   const updateSegment = (x: number, y: number): void => {
     segments.value = [...segments.value, { x, y }];
   };
@@ -89,6 +95,7 @@ const Snake = () => {
           x: axis === 'x' ? coord : snakeHead.value.x,
           y: axis === 'y' ? coord : snakeHead.value.y,
         };
+        triggerdDirection.value = false;
       });
     };
     if (direction.value === 0) {
@@ -155,40 +162,43 @@ const Snake = () => {
   };
 
   const getInputKey = (e: KeyboardEvent): void => {
-    switch (e.key) {
-      case 'w':
-      case 'ArrowUp':
-        if (direction.value !== 2) {
-          direction.value = 0;
-        }
-        break;
-      case 's':
-      case 'ArrowDown':
-        if (direction.value !== 0) {
-          direction.value = 2;
-        }
-        break;
-      case 'a':
-      case 'ArrowLeft':
-        if (direction.value !== 1) {
-          direction.value = 3;
-        }
-        break;
-      case 'd':
-      case 'ArrowRight':
-        if (direction.value !== 3) {
-          direction.value = 1;
-        }
-        break;
-      default:
-        break;
+    if (!triggerdDirection.value) {
+      switch (e.key) {
+        case 'w':
+        case 'ArrowUp':
+          if (direction.value !== 2) {
+            direction.value = 0;
+          }
+          break;
+        case 's':
+        case 'ArrowDown':
+          if (direction.value !== 0) {
+            direction.value = 2;
+          }
+          break;
+        case 'a':
+        case 'ArrowLeft':
+          if (direction.value !== 1) {
+            direction.value = 3;
+          }
+          break;
+        case 'd':
+        case 'ArrowRight':
+          if (direction.value !== 3) {
+            direction.value = 1;
+          }
+          break;
+        default:
+          break;
+      }
     }
+    triggerdDirection.value = true;
   };
 
   const startMoving = (): number => {
     const interval = setInterval(() => {
       move();
-    }, 1000);
+    }, speed.value);
     return interval;
   };
 
@@ -200,13 +210,19 @@ const Snake = () => {
 
   useEffect(() => {
     respawn();
-    const movingInterval = startMoving();
+  }, []);
+
+  useEffect(() => {
     document.addEventListener('keydown', getInputKey);
     return () => {
       document.removeEventListener('keydown', getInputKey);
-      clearInterval(movingInterval);
     };
-  }, []);
+  }, [triggerdDirection.value]);
+
+  useEffect(() => {
+    const movingInterval = startMoving();
+    return () => clearInterval(movingInterval);
+  }, [speed.value]);
 
   return (
     <>
