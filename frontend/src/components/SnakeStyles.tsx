@@ -51,18 +51,11 @@ export const SnakeHeadStyle = ({
     <motion.div
       style={style}
       initial={{
-        left: '0px',
-        bottom: '0px',
-        opacity: 0,
         transform: `rotate(0deg)`,
       }}
       animate={{
-        left: `${x}px`,
-        bottom: `${y}px`,
-        opacity: 1,
         transform: `rotate(${deg}deg)`,
       }}
-      transition={{ duration: 0.4 }}
     />
   );
 };
@@ -80,12 +73,5 @@ export const SnakeSegmentStyle = ({ position }: SnakeSegmentProps) => {
     margin: '1px',
     position: 'absolute',
   };
-  return (
-    <motion.div
-      style={style}
-      initial={{ left: `0px`, bottom: `0px`, opacity: 0 }}
-      animate={{ left: `${x}px`, bottom: `${y}px`, opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    />
-  );
+  return <div style={style} />;
 };

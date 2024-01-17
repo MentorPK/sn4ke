@@ -1,5 +1,3 @@
-import { signal, useSignal, useSignalEffect } from '@preact/signals';
-
 import './style.css';
 import initializeWebSocket from '../../functions/initializeWebSocket';
 import Board from '../../components/Board';
