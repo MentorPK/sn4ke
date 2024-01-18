@@ -3,10 +3,12 @@ import initializeWebSocket from '../../functions/initializeWebSocket';
 import Board from '../../components/Board';
 import Food from '../../components/Food';
 import Snake from '../../components/Snake';
-import { isGameOver } from '../../signals/globalSignals';
 import Options from '../../components/Options';
+import { SignalContext } from '../../signals/SignalProvider';
+import { useContext } from 'preact/hooks';
 
 export const Home = () => {
+  const { isGameOver } = useContext(SignalContext);
   // Create a signal for the WebSocket
   //const socket = signal(null);
   //socket.value = initializeWebSocket();

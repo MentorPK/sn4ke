@@ -1,21 +1,18 @@
-import { batch, useSignal, useSignalEffect } from '@preact/signals';
+import { batch, useSignal } from '@preact/signals';
 import generateRandomNumber from '../functions/generateRandomNumber';
 import { useEffect } from 'preact/hooks';
-import { Position, SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
+import { SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
 import { spawnFood } from './Food';
-import {
-  foodPosition,
-  isGameOver,
-  snakeHead,
-  speed,
-  segments,
-} from '../signals/globalSignals';
+import { SignalContext } from '../signals/SignalProvider';
+import { useContext } from 'preact/hooks';
 
 const Snake = () => {
+  const { foodPosition, isGameOver, snakeHead, speed, segments, snakeBelly } =
+    useContext(SignalContext);
+
   //direction starts on 12 oclock with 0 top 1 on 3 oclock, 2 on 6, 3 on 9
   const direction = useSignal<number>(generateRandomNumber(3));
   const triggerdDirection = useSignal<boolean>(false);
-  const snakeStomach = useSignal<Position[]>([]);
   const foodMatchesLastSegment = useSignal<boolean>(false);
   const updateSegment = (x: number, y: number): void => {
     segments.value = [...segments.value, { x, y }];
@@ -65,12 +62,12 @@ const Snake = () => {
 
   const generateRandomNotOccupiedFoodPosition = (): void => {
     do {
-      spawnFood();
+      spawnFood(foodPosition);
     } while (isFoodOccupyingSnakePosition());
   };
 
   const isFoodOccupyingSnakePosition = (): boolean => {
-    // Check if the position is occupied by the snake (head or segments)
+    // Check if the position is occupied by the snakehead or segments
     return (
       (foodPosition.value.x === snakeHead.value.x &&
         foodPosition.value.y === snakeHead.value.y) ||
@@ -119,25 +116,25 @@ const Snake = () => {
         ? true
         : false;
     if (eating) {
-      snakeStomach.value = [...snakeStomach.value, foodPosition.value];
+      snakeBelly.value = [...snakeBelly.value, foodPosition.value];
       generateRandomNotOccupiedFoodPosition();
     }
   };
 
-  const growSnake = () => {
-    const stomachLenght = snakeStomach.value.length;
+  const growSnake = (): void => {
+    const stomachLenght = snakeBelly.value.length;
     if (stomachLenght > 0 && foodMatchesLastSegment.value) {
       batch(() => {
-        segments.value = [...segments.value, snakeStomach.value[0]];
-        snakeStomach.value = snakeStomach.value.slice(1, 0);
+        segments.value = [...segments.value, snakeBelly.value[0]];
+        snakeBelly.value.shift();
         foodMatchesLastSegment.value = false;
       });
     } else if (stomachLenght > 0) {
       const snakeLength = segments.value.length;
       const lastSegment = segments.value[snakeLength - 1];
       foodMatchesLastSegment.value =
-        lastSegment.x === snakeStomach.value[0].x &&
-        lastSegment.y === snakeStomach.value[0].y;
+        lastSegment.x === snakeBelly.value[0].x &&
+        lastSegment.y === snakeBelly.value[0].y;
     }
   };
 
@@ -154,7 +151,7 @@ const Snake = () => {
   const handleGameOver = (): void => {
     if (
       snakeHead.value.x < 0 ||
-      snakeHead.value.x >= 20 || // Assuming the board size is 20x20
+      snakeHead.value.x >= 20 ||
       snakeHead.value.y < 0 ||
       snakeHead.value.y >= 20
     ) {
@@ -225,15 +222,19 @@ const Snake = () => {
     return () => clearInterval(movingInterval);
   }, [speed.value]);
 
-  useSignalEffect(() => {
-    //console.log(segments.value);
-  });
-
   return (
     <>
-      <SnakeHeadStyle position={snakeHead} direction={direction.value} />
+      <SnakeHeadStyle
+        position={snakeHead.value}
+        belly={snakeBelly.value}
+        direction={direction.value}
+      />
       {segments.value.map((segment, idx) => (
-        <SnakeSegmentStyle position={segment} key={idx} />
+        <SnakeSegmentStyle
+          position={segment}
+          belly={snakeBelly.value}
+          key={idx}
+        />
       ))}
     </>
   );
