@@ -8,8 +8,10 @@ const isGameOver = signal(false);
 const speed = signal(1000);
 const segments = signal<Position[]>([]);
 const snakeBelly = signal<Position[]>([]);
+const wallHack = signal<boolean>(false);
 
 const globalSignals = {
+  wallHack,
   foodPosition,
   snakeHead,
   isGameOver,

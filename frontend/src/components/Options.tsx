@@ -2,7 +2,7 @@ import { computed } from '@preact/signals';
 import { SignalContext } from '../signals/SignalProvider';
 import { useContext } from 'preact/hooks';
 const Options = () => {
-  const { speed, segments, snakeBelly } = useContext(SignalContext);
+  const { speed, segments, snakeBelly, wallHack } = useContext(SignalContext);
 
   const points = computed(() => {
     if (segments.value.length === 3) return 0;
@@ -15,6 +15,8 @@ const Options = () => {
   return (
     <div>
       <h1>Options</h1>
+      <h2>Points</h2>
+      <div>{points}</div>
       <div>
         <button onClick={() => setSpeed(1000)}>Slow</button>
         <button onClick={() => setSpeed(500)}>Normal</button>
@@ -22,8 +24,11 @@ const Options = () => {
         <button onClick={() => setSpeed(100)}>Very Fast</button>
         <button onClick={() => setSpeed(50)}>Speed of Light</button>
       </div>
-      <h2>Points</h2>
-      <div>{points}</div>
+      <div>
+        <button onClick={() => (wallHack.value = !wallHack.value)}>
+          Toggle Wallhack
+        </button>
+      </div>
     </div>
   );
 };

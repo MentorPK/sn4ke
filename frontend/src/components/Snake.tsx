@@ -7,8 +7,15 @@ import { SignalContext } from '../signals/SignalProvider';
 import { useContext } from 'preact/hooks';
 
 const Snake = () => {
-  const { foodPosition, isGameOver, snakeHead, speed, segments, snakeBelly } =
-    useContext(SignalContext);
+  const {
+    foodPosition,
+    isGameOver,
+    snakeHead,
+    speed,
+    segments,
+    snakeBelly,
+    wallHack,
+  } = useContext(SignalContext);
 
   //direction starts on 12 oclock with 0 top 1 on 3 oclock, 2 on 6, 3 on 9
   const direction = useSignal<number>(generateRandomNumber(3));
@@ -90,10 +97,18 @@ const Snake = () => {
             return arr[idx - 1];
           }
         });
-        snakeHead.value = {
-          x: axis === 'x' ? coord : snakeHead.value.x,
-          y: axis === 'y' ? coord : snakeHead.value.y,
-        };
+        if (wallHack.value) {
+          const hackedCord = (coord + 20) % 20;
+          snakeHead.value = {
+            x: axis === 'x' ? hackedCord : snakeHead.value.x,
+            y: axis === 'y' ? hackedCord : snakeHead.value.y,
+          };
+        } else {
+          snakeHead.value = {
+            x: axis === 'x' ? coord : snakeHead.value.x,
+            y: axis === 'y' ? coord : snakeHead.value.y,
+          };
+        }
         triggerdDirection.value = false;
       });
       growSnake();
@@ -202,7 +217,9 @@ const Snake = () => {
 
   useEffect(() => {
     eatFood();
-    handleGameOver();
+    if (!wallHack.value) {
+      handleGameOver();
+    }
     isHeadEatingSegment();
   }, [snakeHead.value]);
 
