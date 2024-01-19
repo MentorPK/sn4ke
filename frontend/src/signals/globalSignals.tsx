@@ -1,23 +1,45 @@
 import { signal } from '@preact/signals';
 import { Position } from '../components/SnakeStyles';
-//TODO signal contextProvivder
+import { generateRandomNumber } from '../functions/snakeFunctions';
+//context Provider or global State Management is not necassary for this project.
+//Too much overhead
 
-const foodPosition = signal({ x: 0, y: 0 });
-const snakeHead = signal({ x: 0, y: 0 });
+//20x20 board, om a x and y coordinate system of 0-19
+const MAX_BOARD_SIIZE = 19;
+
+const foodPosition = signal({
+  x: generateRandomNumber(MAX_BOARD_SIIZE),
+  y: generateRandomNumber(MAX_BOARD_SIIZE),
+});
+const snakeHeadOne = signal({
+  x: generateRandomNumber(MAX_BOARD_SIIZE),
+  y: generateRandomNumber(MAX_BOARD_SIIZE),
+});
+const snakeHeadTwo = signal({
+  x: generateRandomNumber(MAX_BOARD_SIIZE),
+  y: generateRandomNumber(MAX_BOARD_SIIZE),
+});
+
+const snakeSegmentsOne = signal<Position[]>([]);
+const snakeSegmentsTwo = signal<Position[]>([]);
+const snakeBellyOne = signal<Position[]>([]);
+const snakeBellyTwo = signal<Position[]>([]);
+
 const isGameOver = signal(false);
-const speed = signal(1000);
-const segments = signal<Position[]>([]);
-const snakeBelly = signal<Position[]>([]);
+const speed = signal(500);
 const wallHack = signal<boolean>(false);
+const togglePlayerTwo = signal<boolean>(false);
 
-const globalSignals = {
+export {
   wallHack,
   foodPosition,
-  snakeHead,
+  snakeHeadOne,
+  snakeHeadTwo,
   isGameOver,
   speed,
-  segments,
-  snakeBelly,
+  snakeSegmentsOne,
+  snakeSegmentsTwo,
+  snakeBellyOne,
+  snakeBellyTwo,
+  togglePlayerTwo,
 };
-
-export default globalSignals;

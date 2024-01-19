@@ -1,8 +1,9 @@
 import { Signal } from '@preact/signals';
-import generateRandomNumber from '../functions/generateRandomNumber';
 import { motion } from 'framer-motion';
-import { SignalContext } from '../signals/SignalProvider';
-import { useContext } from 'preact/hooks';
+import { foodPosition } from '../signals/globalSignals';
+import { useEffect } from 'preact/hooks';
+import { spawnFood } from '../functions/foodFunctions';
+
 type Position = {
   x: number;
   y: number;
@@ -33,15 +34,10 @@ const FoodStyle = ({ position }: FoodStyleProps) => {
   );
 };
 
-export const spawnFood = (foodPosition: Signal<Position>) => {
-  const xPos = generateRandomNumber(19);
-  const yPos = generateRandomNumber(19);
-  foodPosition.value = { x: xPos, y: yPos };
-};
-
 const Food = () => {
-  const { foodPosition } = useContext(SignalContext);
-  spawnFood(foodPosition);
+  useEffect(() => {
+    spawnFood(foodPosition);
+  }, []);
   return <FoodStyle position={foodPosition} />;
 };
 

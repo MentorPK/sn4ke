@@ -1,6 +1,4 @@
 import React from 'react';
-import { useContext } from 'preact/hooks';
-import { SignalContext } from '../signals/SignalProvider';
 interface BoardProps {
   children: React.ReactNode;
 }

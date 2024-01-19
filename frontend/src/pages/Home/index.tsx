@@ -2,13 +2,12 @@ import './style.css';
 import initializeWebSocket from '../../functions/initializeWebSocket';
 import Board from '../../components/Board';
 import Food from '../../components/Food';
-import Snake from '../../components/Snake';
+import SnakeOne from '../../components/SnakeOne';
 import Options from '../../components/Options';
-import { SignalContext } from '../../signals/SignalProvider';
-import { useContext } from 'preact/hooks';
+import { isGameOver, togglePlayerTwo } from '../../signals/globalSignals';
+import SnakeTwo from '../../components/SnakeTwo';
 
 export const Home = () => {
-  const { isGameOver } = useContext(SignalContext);
   // Create a signal for the WebSocket
   //const socket = signal(null);
   //socket.value = initializeWebSocket();
@@ -25,7 +24,8 @@ export const Home = () => {
           <h1>Game Over</h1>
         ) : (
           <>
-            <Snake />
+            <SnakeOne />
+            {togglePlayerTwo.value && <SnakeTwo />}
             <Food />
           </>
         )}

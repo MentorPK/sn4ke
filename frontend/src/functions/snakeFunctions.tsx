@@ -1,0 +1,202 @@
+import { Signal, batch } from '@preact/signals';
+import { Position } from '../components/SnakeStyles';
+import { spawnFood } from './foodFunctions';
+
+export const generateRandomNumber = (multiplier: number): number => {
+  return Math.round(Math.random() * multiplier);
+};
+const updateSegments = (
+  x: number,
+  y: number,
+  snakeSegments: Signal<Position[]>
+): void => {
+  snakeSegments.value = [...snakeSegments.value, { x, y }];
+};
+const areSegmentsBehindBoard = (snakeSemgnets: Signal<Position[]>): boolean => {
+  return snakeSemgnets.value.some(
+    (segment) =>
+      segment.x <= 0 || segment.y <= 0 || segment.x >= 20 || segment.y >= 20
+  );
+};
+const spawnSnake = (
+  snakeHead: Signal<Position>,
+  snakeSegments: Signal<Position[]>,
+  direction: Signal<number>
+): void => {
+  const snakeHeadX = generateRandomNumber(19);
+  const snakeHeadY = generateRandomNumber(19);
+  snakeHead.value = { x: snakeHeadX, y: snakeHeadY };
+  const arr = [...Array(3).keys()];
+
+  const updateSnakePosition = (offset: number, axis: 'x' | 'y'): void => {
+    arr.forEach((_, idx) => {
+      const coord = snakeHead.value[axis] + offset * (idx + 1);
+      updateSegments(
+        axis === 'x' ? coord : snakeHead.value.x,
+        axis === 'y' ? coord : snakeHead.value.y,
+        snakeSegments
+      );
+    });
+  };
+
+  if (direction.value === 0) {
+    updateSnakePosition(-1, 'y');
+  } else if (direction.value === 1) {
+    updateSnakePosition(-1, 'x');
+  } else if (direction.value === 2) {
+    updateSnakePosition(1, 'y');
+  } else {
+    updateSnakePosition(1, 'x');
+  }
+};
+
+export const respawmSnake = (
+  snakeSegments: Signal<Position[]>,
+  snakeHead: Signal<Position>,
+  direction: Signal<number>
+): void => {
+  do {
+    //updatePosition function is triggering infite loop because new segments are attached to the old one but never reseted after head spawns
+    snakeSegments.value = [];
+    spawnSnake(snakeHead, snakeSegments, direction);
+  } while (areSegmentsBehindBoard(snakeSegments));
+};
+
+const isFoodOccupyingSnakePosition = (
+  foodPosition: Signal<Position>,
+  snakeHead: Signal<Position>,
+  snakeSegments: Signal<Position[]>
+): boolean => {
+  // Check if the position is occupied by the snakehead or segments
+  return (
+    (foodPosition.value.x === snakeHead.value.x &&
+      foodPosition.value.y === snakeHead.value.y) ||
+    snakeSegments.value.some(
+      (segment) =>
+        segment.x === foodPosition.value.x && segment.y === foodPosition.value.y
+    )
+  );
+};
+
+const generateRandomNotOccupiedFoodPosition = (
+  foodPosition: Signal<Position>,
+  snakeHead: Signal<Position>,
+  snakeSegments: Signal<Position[]>
+): void => {
+  do {
+    spawnFood(foodPosition);
+  } while (
+    isFoodOccupyingSnakePosition(foodPosition, snakeHead, snakeSegments)
+  );
+};
+
+export const eatFood = (
+  snakeHead: Signal<Position>,
+  snakeSegments: Signal<Position[]>,
+  snakeBelly: Signal<Position[]>,
+  foodPosition: Signal<Position>
+): void => {
+  const eating =
+    snakeHead.value.x === foodPosition.value.x &&
+    snakeHead.value.y === foodPosition.value.y
+      ? true
+      : false;
+  if (eating) {
+    snakeBelly.value = [...snakeBelly.value, foodPosition.value];
+    generateRandomNotOccupiedFoodPosition(
+      foodPosition,
+      snakeHead,
+      snakeSegments
+    );
+  }
+};
+
+const growSnake = (
+  snakeBelly: Signal<Position[]>,
+  snakeSegments: Signal<(Position | undefined)[]>,
+  foodMatchesLastSegment: Signal<boolean>
+): void => {
+  const stomachLenght = snakeBelly.value.length;
+  if (stomachLenght > 0 && foodMatchesLastSegment.value) {
+    batch(() => {
+      snakeSegments.value = [...snakeSegments.value, snakeBelly.value[0]];
+      snakeBelly.value.shift();
+      foodMatchesLastSegment.value = false;
+    });
+  } else if (stomachLenght > 0 && snakeBelly.value[0] !== undefined) {
+    const snakeLength = snakeSegments.value.length;
+    const lastSegment = snakeSegments.value[snakeLength - 1];
+    foodMatchesLastSegment.value =
+      lastSegment?.x === snakeBelly.value[0].x &&
+      lastSegment?.y === snakeBelly.value[0].y;
+  }
+};
+const move = (
+  snakeHead: Signal<Position>,
+  snakeSegments: Signal<(Position | undefined)[]>,
+  snakeBelly: Signal<Position[]>,
+  direction: Signal<number>,
+  triggerdDirection: Signal<boolean>,
+  wallHack: Signal<boolean>,
+  foodMatchesLastSegment: Signal<boolean>
+): void => {
+  const updateMovment = (offset: number, axis: 'x' | 'y') => {
+    const coord = snakeHead.value[axis] + offset;
+    batch(() => {
+      snakeSegments.value = snakeSegments.value.map((_, idx, arr) => {
+        if (idx === 0) {
+          return snakeHead.value;
+        } else {
+          return arr[idx - 1];
+        }
+      });
+      if (wallHack.value) {
+        const hackedCord = (coord + 20) % 20;
+        snakeHead.value = {
+          x: axis === 'x' ? hackedCord : snakeHead.value.x,
+          y: axis === 'y' ? hackedCord : snakeHead.value.y,
+        };
+      } else {
+        snakeHead.value = {
+          x: axis === 'x' ? coord : snakeHead.value.x,
+          y: axis === 'y' ? coord : snakeHead.value.y,
+        };
+      }
+      triggerdDirection.value = false;
+    });
+    growSnake(snakeBelly, snakeSegments, foodMatchesLastSegment);
+  };
+  if (direction.value === 0) {
+    updateMovment(1, 'y');
+  } else if (direction.value === 1) {
+    updateMovment(1, 'x');
+  } else if (direction.value === 2) {
+    updateMovment(-1, 'y');
+  } else {
+    updateMovment(-1, 'x');
+  }
+};
+
+export const startMoving = (
+  snakeHead: Signal<Position>,
+  snakeSegments: Signal<Position[]>,
+  snakeBelly: Signal<Position[]>,
+  direction: Signal<number>,
+  triggerdDirection: Signal<boolean>,
+  wallHack: Signal<boolean>,
+  foodMatchesLastSegment: Signal<boolean>,
+  speed: Signal<number>
+): number => {
+  const interval = setInterval(() => {
+    move(
+      snakeHead,
+      snakeSegments,
+      snakeBelly,
+      direction,
+      triggerdDirection,
+      wallHack,
+      foodMatchesLastSegment
+    );
+  }, speed.value);
+  return interval;
+};

@@ -1,4 +1,3 @@
-import { Signal } from '@preact/signals';
 import { motion } from 'framer-motion';
 
 export type Position = {
