@@ -28,8 +28,8 @@ const snakeBellyTwo = signal<Position[]>([]);
 const isGameOver = signal(false);
 const speed = signal(500);
 const wallHack = signal<boolean>(false);
-const togglePlayerTwo = signal<boolean>(false);
-
+const activePlayerTwo = signal<boolean>(false);
+const startGame = signal<boolean>(false);
 export {
   wallHack,
   foodPosition,
@@ -41,5 +41,6 @@ export {
   snakeSegmentsTwo,
   snakeBellyOne,
   snakeBellyTwo,
-  togglePlayerTwo,
+  activePlayerTwo,
+  startGame,
 };

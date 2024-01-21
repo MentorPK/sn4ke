@@ -4,7 +4,7 @@ import Board from '../../components/Board';
 import Food from '../../components/Food';
 import SnakeOne from '../../components/SnakeOne';
 import Options from '../../components/Options';
-import { isGameOver, togglePlayerTwo } from '../../signals/globalSignals';
+import { isGameOver, activePlayerTwo } from '../../signals/globalSignals';
 import SnakeTwo from '../../components/SnakeTwo';
 
 export const Home = () => {
@@ -25,8 +25,8 @@ export const Home = () => {
         ) : (
           <>
             <SnakeOne />
-            {togglePlayerTwo.value && <SnakeTwo />}
             <Food />
+            {activePlayerTwo.value && <SnakeTwo />}
           </>
         )}
       </Board>

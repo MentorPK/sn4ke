@@ -4,7 +4,8 @@ import {
   snakeSegmentsOne,
   snakeBellyOne,
   wallHack,
-  togglePlayerTwo,
+  activePlayerTwo,
+  startGame,
 } from '../signals/globalSignals';
 const Options = () => {
   const points = computed(() => {
@@ -18,6 +19,14 @@ const Options = () => {
   return (
     <div>
       <h1>Options</h1>
+      <div>
+        <button onClick={() => (startGame.value = true)}>Start Game</button>
+      </div>
+      <div>
+        <button onClick={() => (activePlayerTwo.value = true)}>
+          Activate Player 2 (PC)
+        </button>
+      </div>
       <h2>Points</h2>
       <div>{points}</div>
       <div>
@@ -34,7 +43,7 @@ const Options = () => {
       </div>
       <div>
         <button
-          onClick={() => (togglePlayerTwo.value = !togglePlayerTwo.value)}
+          onClick={() => (activePlayerTwo.value = !activePlayerTwo.value)}
         >
           Toggle SecondPlayer
         </button>

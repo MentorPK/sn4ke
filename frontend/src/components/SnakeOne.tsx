@@ -1,4 +1,4 @@
-import { useSignal, useSignalEffect } from '@preact/signals';
+import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import { SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
 import {
@@ -9,6 +9,7 @@ import {
   snakeSegmentsOne,
   snakeBellyOne,
   wallHack,
+  startGame,
 } from '../signals/globalSignals';
 import {
   eatFood,
@@ -91,25 +92,31 @@ const Snake = () => {
   }, []);
 
   useEffect(() => {
-    document.addEventListener('keydown', getInputKey);
+    if (startGame.value) {
+      document.addEventListener('keydown', getInputKey);
+    }
     return () => {
       document.removeEventListener('keydown', getInputKey);
     };
-  }, [triggerdDirection.value]);
+  }, [triggerdDirection.value, startGame.value]);
 
   useEffect(() => {
-    const movingInterval = startMoving(
-      snakeHeadOne,
-      snakeSegmentsOne,
-      snakeBellyOne,
-      direction,
-      triggerdDirection,
-      wallHack,
-      foodMatchesLastSegment,
-      speed
-    );
+    let movingInterval: number | undefined;
+    if (startGame.value) {
+      movingInterval = startMoving(
+        snakeHeadOne,
+        snakeSegmentsOne,
+        snakeBellyOne,
+        direction,
+        triggerdDirection,
+        wallHack,
+        foodMatchesLastSegment,
+        speed
+      );
+    }
+
     return () => clearInterval(movingInterval);
-  }, [speed.value]);
+  }, [speed.value, startGame.value]);
 
   return (
     <>
