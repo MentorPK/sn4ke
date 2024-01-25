@@ -3,6 +3,7 @@ import {
   snakeBellyTwo,
   snakeHeadTwo,
   snakeSegmentsTwo,
+  foodPosition,
 } from '../signals/globalSignals';
 import { SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
 import {
@@ -15,11 +16,19 @@ const SnakeTwo = () => {
   //direction need to be thought of cause it will be genrated by the PC
   const direction = useSignal<number>(generateRandomNumber(3));
 
+  const move = () => {
+    const difX = snakeHeadTwo.value.x - foodPosition.value.x;
+    const difY = snakeHeadTwo.value.y - foodPosition.value.y;
+    console.log(difX, difY);
+  };
+  move();
   useEffect(() => {
     respawmSnake(snakeSegmentsTwo, snakeHeadTwo, direction);
   }, []);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    move();
+  }, []);
   return (
     <>
       <SnakeHeadStyle
