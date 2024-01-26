@@ -111,7 +111,8 @@ const Snake = () => {
         triggerdDirection,
         wallHack,
         foodMatchesLastSegment,
-        speed
+        speed,
+        false
       );
     }
 

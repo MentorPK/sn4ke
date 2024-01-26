@@ -131,6 +131,13 @@ const growSnake = (
       lastSegment?.y === snakeBelly.value[0].y;
   }
 };
+
+const triggerBotDirection = (
+  snakeHead: Signal<Position>,
+  direction: Signal<number>,
+  foodPosition: Signal<Position>
+) => {};
+
 const move = (
   snakeHead: Signal<Position>,
   snakeSegments: Signal<(Position | undefined)[]>,
@@ -138,7 +145,8 @@ const move = (
   direction: Signal<number>,
   triggerdDirection: Signal<boolean>,
   wallHack: Signal<boolean>,
-  foodMatchesLastSegment: Signal<boolean>
+  foodMatchesLastSegment: Signal<boolean>,
+  isBot: boolean
 ): void => {
   const updateMovment = (offset: number, axis: 'x' | 'y') => {
     const coord = snakeHead.value[axis] + offset;
@@ -185,7 +193,8 @@ export const startMoving = (
   triggerdDirection: Signal<boolean>,
   wallHack: Signal<boolean>,
   foodMatchesLastSegment: Signal<boolean>,
-  speed: Signal<number>
+  speed: Signal<number>,
+  isBot: boolean
 ): number => {
   const interval = setInterval(() => {
     move(
@@ -195,7 +204,8 @@ export const startMoving = (
       direction,
       triggerdDirection,
       wallHack,
-      foodMatchesLastSegment
+      foodMatchesLastSegment,
+      isBot
     );
   }, speed.value);
   return interval;
