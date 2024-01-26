@@ -137,44 +137,47 @@ const triggerBotDirection = (
   direction: Signal<number>,
   food: Signal<Position>
 ): TriggerDirection => {
-  const offset = 0;
-  const axis = '';
+  const difX = Math.abs(snakeHead.value.x - food.value.x);
+  const difY = Math.abs(snakeHead.value.y - food.value.y);
+
   if (snakeHead.value.x < food.value.x) {
+    direction.value = 1;
     return { offset: 1, axis: 'x' }; // Move right
   } else if (snakeHead.value.x > food.value.x) {
+    direction.value = 3;
     return { offset: -1, axis: 'x' }; // Move left
   } else if (snakeHead.value.y < food.value.y) {
-    return { offset: 1, axis: 'y' }; // Move down
+    direction.value = 0;
+    return { offset: 1, axis: 'y' }; // Move up
   } else if (snakeHead.value.y > food.value.y) {
-    return { offset: -1, axis: 'y' }; // Move up
+    direction.value = 2;
+    return { offset: -1, axis: 'y' }; // Move down
   }
 };
 
-type MoveOptions =
-  | {
-      snakeHead: Signal<Position>;
-      snakeSegments: Signal<(Position | undefined)[]>;
-      snakeBelly: Signal<Position[]>;
-      direction: Signal<number>;
-      triggerdDirection: Signal<boolean>;
-      wallHack: Signal<boolean>;
-      foodMatchesLastSegment: Signal<boolean>;
-      isBot: true;
-      food: Signal<Position>;
-    }
-  | {
-      snakeHead: Signal<Position>;
-      snakeSegments: Signal<(Position | undefined)[]>;
-      snakeBelly: Signal<Position[]>;
-      direction: Signal<number>;
-      triggerdDirection: Signal<boolean>;
-      wallHack: Signal<boolean>;
-      foodMatchesLastSegment: Signal<boolean>;
-      isBot?: false;
-      food?: never;
-    };
+type PlayerMoveOptions = {
+  snakeHead: Signal<Position>;
+  snakeSegments: Signal<(Position | undefined)[]>;
+  snakeBelly: Signal<Position[]>;
+  direction: Signal<number>;
+  triggerdDirection: Signal<boolean>;
+  wallHack: Signal<boolean>;
+  foodMatchesLastSegment: Signal<boolean>;
+};
 
-const move = (options: MoveOptions): void => {
+type BotMoveOptions = {
+  snakeHead: Signal<Position>;
+  snakeSegments: Signal<(Position | undefined)[]>;
+  snakeBelly: Signal<Position[]>;
+  direction: Signal<number>;
+  triggerdDirection: Signal<boolean>;
+  wallHack: Signal<boolean>;
+  foodMatchesLastSegment: Signal<boolean>;
+  isBot: true;
+  food: Signal<Position>;
+};
+
+const move = (options: PlayerMoveOptions | BotMoveOptions): void => {
   const {
     snakeHead,
     snakeSegments,
@@ -183,8 +186,6 @@ const move = (options: MoveOptions): void => {
     triggerdDirection,
     wallHack,
     foodMatchesLastSegment,
-    isBot,
-    food,
   } = options;
 
   const updateMovment = (offset: number, axis: 'x' | 'y') => {
@@ -213,7 +214,8 @@ const move = (options: MoveOptions): void => {
     });
     growSnake(snakeBelly, snakeSegments, foodMatchesLastSegment);
   };
-  if (isBot) {
+  if ('isBot' in options) {
+    const { food } = options;
     const dir = triggerBotDirection(snakeHead, direction, food);
     updateMovment(dir.offset, dir.axis);
   } else {

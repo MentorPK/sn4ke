@@ -7,9 +7,11 @@ import {
   startGame,
   speed,
   wallHack,
+  isGameOver,
 } from '../signals/globalSignals';
 import { SnakeHeadStyle, SnakeSegmentStyle } from './SnakeStyles';
 import {
+  eatFood,
   generateRandomNumber,
   respawmSnake,
   startMoving,
@@ -19,6 +21,17 @@ import { useSignal } from '@preact/signals';
 const SnakeTwo = () => {
   //direction need to be thought of cause it will be genrated by the PC
   const direction = useSignal<number>(generateRandomNumber(3));
+  const foodMatchesLastSegment = useSignal<boolean>(false);
+
+  const isHeadEatingSegment = () => {
+    const eaten = snakeSegmentsTwo.value.some(
+      (segment) =>
+        segment.x === snakeHeadTwo.value.x && segment.y === snakeHeadTwo.value.y
+    );
+    if (eaten) {
+      isGameOver.value = true;
+    }
+  };
 
   useEffect(() => {
     let movingInterval: number | undefined;
@@ -29,16 +42,19 @@ const SnakeTwo = () => {
         snakeBelly: snakeBellyTwo,
         direction: direction,
         wallHack: wallHack,
+        foodMatchesLastSegment: foodMatchesLastSegment,
         speed: speed,
         isBot: true,
         food: foodPosition,
       };
       movingInterval = startMoving(options);
     }
-
     return () => clearInterval(movingInterval);
   }, [speed.value, startGame.value]);
-
+  useEffect(() => {
+    eatFood(snakeHeadTwo, snakeSegmentsTwo, snakeBellyTwo, foodPosition);
+    isHeadEatingSegment();
+  }, [snakeHeadTwo.value]);
   useEffect(() => {
     respawmSnake(snakeSegmentsTwo, snakeHeadTwo, direction);
   }, []);
