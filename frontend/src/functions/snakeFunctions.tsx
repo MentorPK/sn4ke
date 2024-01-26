@@ -131,23 +131,62 @@ const growSnake = (
       lastSegment?.y === snakeBelly.value[0].y;
   }
 };
-
+type TriggerDirection = { offset: number; axis: 'x' | 'y' };
 const triggerBotDirection = (
   snakeHead: Signal<Position>,
   direction: Signal<number>,
-  foodPosition: Signal<Position>
-) => {};
+  food: Signal<Position>
+): TriggerDirection => {
+  const offset = 0;
+  const axis = '';
+  if (snakeHead.value.x < food.value.x) {
+    return { offset: 1, axis: 'x' }; // Move right
+  } else if (snakeHead.value.x > food.value.x) {
+    return { offset: -1, axis: 'x' }; // Move left
+  } else if (snakeHead.value.y < food.value.y) {
+    return { offset: 1, axis: 'y' }; // Move down
+  } else if (snakeHead.value.y > food.value.y) {
+    return { offset: -1, axis: 'y' }; // Move up
+  }
+};
 
-const move = (
-  snakeHead: Signal<Position>,
-  snakeSegments: Signal<(Position | undefined)[]>,
-  snakeBelly: Signal<Position[]>,
-  direction: Signal<number>,
-  triggerdDirection: Signal<boolean>,
-  wallHack: Signal<boolean>,
-  foodMatchesLastSegment: Signal<boolean>,
-  isBot: boolean
-): void => {
+type MoveOptions =
+  | {
+      snakeHead: Signal<Position>;
+      snakeSegments: Signal<(Position | undefined)[]>;
+      snakeBelly: Signal<Position[]>;
+      direction: Signal<number>;
+      triggerdDirection: Signal<boolean>;
+      wallHack: Signal<boolean>;
+      foodMatchesLastSegment: Signal<boolean>;
+      isBot: true;
+      food: Signal<Position>;
+    }
+  | {
+      snakeHead: Signal<Position>;
+      snakeSegments: Signal<(Position | undefined)[]>;
+      snakeBelly: Signal<Position[]>;
+      direction: Signal<number>;
+      triggerdDirection: Signal<boolean>;
+      wallHack: Signal<boolean>;
+      foodMatchesLastSegment: Signal<boolean>;
+      isBot?: false;
+      food?: never;
+    };
+
+const move = (options: MoveOptions): void => {
+  const {
+    snakeHead,
+    snakeSegments,
+    snakeBelly,
+    direction,
+    triggerdDirection,
+    wallHack,
+    foodMatchesLastSegment,
+    isBot,
+    food,
+  } = options;
+
   const updateMovment = (offset: number, axis: 'x' | 'y') => {
     const coord = snakeHead.value[axis] + offset;
     batch(() => {
@@ -174,39 +213,52 @@ const move = (
     });
     growSnake(snakeBelly, snakeSegments, foodMatchesLastSegment);
   };
-  if (direction.value === 0) {
-    updateMovment(1, 'y');
-  } else if (direction.value === 1) {
-    updateMovment(1, 'x');
-  } else if (direction.value === 2) {
-    updateMovment(-1, 'y');
+  if (isBot) {
+    const dir = triggerBotDirection(snakeHead, direction, food);
+    updateMovment(dir.offset, dir.axis);
   } else {
-    updateMovment(-1, 'x');
+    if (direction.value === 0) {
+      updateMovment(1, 'y');
+    } else if (direction.value === 1) {
+      updateMovment(1, 'x');
+    } else if (direction.value === 2) {
+      updateMovment(-1, 'y');
+    } else {
+      updateMovment(-1, 'x');
+    }
   }
 };
 
-export const startMoving = (
-  snakeHead: Signal<Position>,
-  snakeSegments: Signal<Position[]>,
-  snakeBelly: Signal<Position[]>,
-  direction: Signal<number>,
-  triggerdDirection: Signal<boolean>,
-  wallHack: Signal<boolean>,
-  foodMatchesLastSegment: Signal<boolean>,
-  speed: Signal<number>,
-  isBot: boolean
-): number => {
+type StartMoveOptions =
+  | {
+      snakeHead: Signal<Position>;
+      snakeSegments: Signal<(Position | undefined)[]>;
+      snakeBelly: Signal<Position[]>;
+      direction: Signal<number>;
+      triggerdDirection: Signal<boolean>;
+      wallHack: Signal<boolean>;
+      foodMatchesLastSegment: Signal<boolean>;
+      speed: Signal<number>;
+      isBot: true;
+      food: Signal<Position>;
+    }
+  | {
+      snakeHead: Signal<Position>;
+      snakeSegments: Signal<(Position | undefined)[]>;
+      snakeBelly: Signal<Position[]>;
+      direction: Signal<number>;
+      triggerdDirection: Signal<boolean>;
+      wallHack: Signal<boolean>;
+      foodMatchesLastSegment: Signal<boolean>;
+      speed: Signal<number>;
+      isBot?: false;
+      food?: never;
+    };
+
+export const startMoving = (options: StartMoveOptions): number => {
+  const { speed } = options;
   const interval = setInterval(() => {
-    move(
-      snakeHead,
-      snakeSegments,
-      snakeBelly,
-      direction,
-      triggerdDirection,
-      wallHack,
-      foodMatchesLastSegment,
-      isBot
-    );
+    move(options);
   }, speed.value);
   return interval;
 };

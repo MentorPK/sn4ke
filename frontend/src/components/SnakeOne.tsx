@@ -103,17 +103,17 @@ const Snake = () => {
   useEffect(() => {
     let movingInterval: number | undefined;
     if (startGame.value) {
-      movingInterval = startMoving(
-        snakeHeadOne,
-        snakeSegmentsOne,
-        snakeBellyOne,
-        direction,
-        triggerdDirection,
-        wallHack,
-        foodMatchesLastSegment,
-        speed,
-        false
-      );
+      const options = {
+        snakeHead: snakeHeadOne,
+        snakeSegments: snakeSegmentsOne,
+        snakeBelly: snakeBellyOne,
+        direction: direction,
+        triggerdDirection: triggerdDirection,
+        wallHack: wallHack,
+        foodMatchesLastSegment: foodMatchesLastSegment,
+        speed: speed,
+      };
+      movingInterval = startMoving(options);
     }
 
     return () => clearInterval(movingInterval);
