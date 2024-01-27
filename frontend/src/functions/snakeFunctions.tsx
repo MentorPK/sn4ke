@@ -131,25 +131,53 @@ const growSnake = (
       lastSegment?.y === snakeBelly.value[0].y;
   }
 };
+
+const isHeadFacingFood = (
+  snakeHead: Signal<Position>,
+  direction: Signal<number>,
+  food: Signal<Position>
+): boolean => {
+  //If difX is below 0 the foodPosition in more on the right
+  const ditanceX = snakeHead.value.x - food.value.x;
+  //If difY is below 0 the foodPosition in more on the top
+  const distanceY = snakeHead.value.y - food.value.y;
+  const matchPosX = snakeHead.value.x === food.value.x;
+  const matchPosY = snakeHead.value.y === food.value.y;
+
+  if (matchPosX && direction.value === 0 && distanceY > 0) {
+    return true;
+  } else if (matchPosX && direction.value === 2 && distanceY < 0) {
+    return true;
+  } else if (matchPosY && direction.value === 1 && ditanceX > 0) {
+    return true;
+  } else if (matchPosY && direction.value === 3 && ditanceX < 0) {
+    return true;
+  } else return false;
+};
+
 type TriggerDirection = { offset: number; axis: 'x' | 'y' };
 const triggerBotDirection = (
   snakeHead: Signal<Position>,
   direction: Signal<number>,
-  food: Signal<Position>
+  food: Signal<Position>,
+  triggerdDirection: Signal<boolean>
 ): TriggerDirection => {
-  const difX = Math.abs(snakeHead.value.x - food.value.x);
-  const difY = Math.abs(snakeHead.value.y - food.value.y);
+  console.log(direction.value, 'dire');
+  triggerdDirection.value = true;
+  const difX = snakeHead.value.x - food.value.x;
+  //If difY is below 0 the foodPosition in more on the top
+  const difY = snakeHead.value.y - food.value.y;
 
-  if (snakeHead.value.x < food.value.x) {
+  if (snakeHead.value.x < food.value.x && direction.value !== 3) {
     direction.value = 1;
     return { offset: 1, axis: 'x' }; // Move right
-  } else if (snakeHead.value.x > food.value.x) {
+  } else if (snakeHead.value.x > food.value.x && direction.value !== 1) {
     direction.value = 3;
     return { offset: -1, axis: 'x' }; // Move left
-  } else if (snakeHead.value.y < food.value.y) {
+  } else if (snakeHead.value.y < food.value.y && direction.value !== 2) {
     direction.value = 0;
     return { offset: 1, axis: 'y' }; // Move up
-  } else if (snakeHead.value.y > food.value.y) {
+  } else if (snakeHead.value.y > food.value.y && direction.value !== 0) {
     direction.value = 2;
     return { offset: -1, axis: 'y' }; // Move down
   }
@@ -216,7 +244,12 @@ const move = (options: PlayerMoveOptions | BotMoveOptions): void => {
   };
   if ('isBot' in options) {
     const { food } = options;
-    const dir = triggerBotDirection(snakeHead, direction, food);
+    const dir = triggerBotDirection(
+      snakeHead,
+      direction,
+      food,
+      triggerdDirection
+    );
     updateMovment(dir.offset, dir.axis);
   } else {
     if (direction.value === 0) {
