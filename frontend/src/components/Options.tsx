@@ -7,6 +7,7 @@ import {
   activePlayerTwo,
   startGame,
 } from '../signals/globalSignals';
+import Code from './Code';
 const Options = () => {
   const points = computed(() => {
     if (snakeSegmentsOne.value.length === 3) return 0;
@@ -21,25 +22,49 @@ const Options = () => {
       <h1>Options</h1>
       <div>
         <button onClick={() => (startGame.value = true)}>Start Game</button>
+        <Code obj={{ startGame }} />
       </div>
       <div>
         <button onClick={() => (activePlayerTwo.value = true)}>
           Activate Player 2 (PC)
         </button>
+        <Code obj={{ activePlayerTwo }} />
       </div>
       <h2>Points</h2>
       <div>{points}</div>
-      <div>
-        <button onClick={() => setSpeed(500)}>Slow</button>
-        <button onClick={() => setSpeed(250)}>Normal</button>
-        <button onClick={() => setSpeed(100)}>Fast</button>
-        <button onClick={() => setSpeed(50)}>Very Fast</button>
-        <button onClick={() => setSpeed(25)}>Speed of Light</button>
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div>
+            <button onClick={() => setSpeed(500)}>Slow</button>
+          </div>
+          <div>
+            <button onClick={() => setSpeed(250)}>Normal</button>
+          </div>
+          <div>
+            <button onClick={() => setSpeed(100)}>Fast</button>
+          </div>
+          <div>
+            <button onClick={() => setSpeed(50)}>Very Fast</button>
+          </div>
+          <div>
+            <button onClick={() => setSpeed(25)}>Speed of Light</button>
+          </div>
+        </div>
+        <Code obj={{ speed }} />
       </div>
+      <br />
       <div>
         <button onClick={() => (wallHack.value = !wallHack.value)}>
           Toggle Wallhack
         </button>
+        <Code obj={{ wallHack }} />
       </div>
       <div>
         <button
@@ -47,6 +72,7 @@ const Options = () => {
         >
           Toggle SecondPlayer
         </button>
+        <Code obj={{ activePlayerTwo }} />
       </div>
     </div>
   );
