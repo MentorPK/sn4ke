@@ -21,7 +21,9 @@ const Options = () => {
     <div>
       <h1>Options</h1>
       <div>
-        <button onClick={() => (startGame.value = true)}>Start Game</button>
+        <button onClick={() => (startGame.value = !startGame.value)}>
+          Toggle Start Game
+        </button>
         <Code obj={{ startGame }} />
       </div>
       <div>
@@ -41,21 +43,11 @@ const Options = () => {
             alignItems: 'center',
           }}
         >
-          <div>
-            <button onClick={() => setSpeed(500)}>Slow</button>
-          </div>
-          <div>
-            <button onClick={() => setSpeed(250)}>Normal</button>
-          </div>
-          <div>
-            <button onClick={() => setSpeed(100)}>Fast</button>
-          </div>
-          <div>
-            <button onClick={() => setSpeed(50)}>Very Fast</button>
-          </div>
-          <div>
-            <button onClick={() => setSpeed(25)}>Speed of Light</button>
-          </div>
+          <button onClick={() => setSpeed(500)}>Slow 500</button>
+          <button onClick={() => setSpeed(250)}>Normal 250</button>
+          <button onClick={() => setSpeed(100)}>Fast 100</button>
+          <button onClick={() => setSpeed(50)}>Very Fast 50</button>
+          <button onClick={() => setSpeed(25)}>Speed of Light 25</button>
         </div>
         <Code obj={{ speed }} />
       </div>

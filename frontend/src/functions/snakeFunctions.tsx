@@ -169,18 +169,38 @@ const triggerBotDirection = (
   //If difY is below 0 the foodPosition in more on the top
   const difY = snakeHead.value.y - food.value.y;
 
-  if (snakeHead.value.x < food.value.x && direction.value !== 3) {
-    direction.value = 1;
-    return { offset: 1, axis: 'x' }; // Move right
-  } else if (snakeHead.value.x > food.value.x && direction.value !== 1) {
-    direction.value = 3;
-    return { offset: -1, axis: 'x' }; // Move left
-  } else if (snakeHead.value.y < food.value.y && direction.value !== 2) {
-    direction.value = 0;
-    return { offset: 1, axis: 'y' }; // Move up
-  } else if (snakeHead.value.y > food.value.y && direction.value !== 0) {
-    direction.value = 2;
-    return { offset: -1, axis: 'y' }; // Move down
+  if (snakeHead.value.x < food.value.x && !headFacesFood) {
+    if (!headFacesFood) {
+      direction.value = 1;
+      return { offset: 1, axis: 'x' }; // Move right
+    } else {
+      direction.value = 0;
+      return { offset: 1, axis: 'y' }; // Move up
+    }
+  } else if (snakeHead.value.x > food.value.x) {
+    if (!headFacesFood) {
+      direction.value = 3;
+      return { offset: -1, axis: 'x' }; // Move left
+    } else {
+      direction.value = 0;
+      return { offset: 1, axis: 'y' }; // Move up
+    }
+  } else if (snakeHead.value.y < food.value.y) {
+    if (!headFacesFood) {
+      direction.value = 0;
+      return { offset: 1, axis: 'y' }; // Move up
+    } else {
+      direction.value = 3;
+      return { offset: -1, axis: 'x' }; // Move left
+    }
+  } else if (snakeHead.value.y > food.value.y) {
+    if (!headFacesFood) {
+      direction.value = 2;
+      return { offset: -1, axis: 'y' }; // Move down
+    } else {
+      direction.value = 3;
+      return { offset: -1, axis: 'x' }; // Move left
+    }
   }
 };
 
