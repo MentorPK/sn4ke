@@ -8,6 +8,7 @@ import {
   startGame,
 } from '../signals/globalSignals';
 import Code from './Code';
+import KeySwitchButton from './KeySwitchButton';
 const Options = () => {
   const points = computed(() => {
     if (snakeSegmentsOne.value.length === 3) return 0;
@@ -18,53 +19,69 @@ const Options = () => {
   };
 
   return (
-    <div>
-      <h1>Options</h1>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}
+    >
       <div>
-        <button onClick={() => (startGame.value = !startGame.value)}>
-          Toggle Start Game
-        </button>
-        <Code obj={{ startGame }} />
-      </div>
-      <div>
-        <button onClick={() => (activePlayerTwo.value = true)}>
-          Activate Player 2 (PC)
-        </button>
-        <Code obj={{ activePlayerTwo }} />
-      </div>
-      <h2>Points</h2>
-      <div>{points}</div>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <button onClick={() => setSpeed(500)}>Slow 500</button>
-          <button onClick={() => setSpeed(250)}>Normal 250</button>
-          <button onClick={() => setSpeed(100)}>Fast 100</button>
-          <button onClick={() => setSpeed(50)}>Very Fast 50</button>
-          <button onClick={() => setSpeed(25)}>Speed of Light 25</button>
+        <KeySwitchButton keySwitch="up" />
+        <div>
+          <KeySwitchButton keySwitch="left" />
+          <KeySwitchButton keySwitch="down" />
+          <KeySwitchButton keySwitch="right" />
         </div>
-        <Code obj={{ speed }} />
-      </div>
-      <br />
-      <div>
-        <button onClick={() => (wallHack.value = !wallHack.value)}>
-          Toggle Wallhack
-        </button>
-        <Code obj={{ wallHack }} />
       </div>
       <div>
-        <button
-          onClick={() => (activePlayerTwo.value = !activePlayerTwo.value)}
-        >
-          Toggle SecondPlayer
-        </button>
-        <Code obj={{ activePlayerTwo }} />
+        <h1>Options</h1>
+        <div>
+          <button onClick={() => (startGame.value = !startGame.value)}>
+            Toggle Start Game
+          </button>
+          <Code obj={{ startGame }} />
+        </div>
+        <div>
+          <button onClick={() => (activePlayerTwo.value = true)}>
+            Activate Player 2 (PC)
+          </button>
+          <Code obj={{ activePlayerTwo }} />
+        </div>
+        <h2>Points</h2>
+        <div>{points}</div>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <button onClick={() => setSpeed(500)}>Slow 500</button>
+            <button onClick={() => setSpeed(250)}>Normal 250</button>
+            <button onClick={() => setSpeed(100)}>Fast 100</button>
+            <button onClick={() => setSpeed(50)}>Very Fast 50</button>
+            <button onClick={() => setSpeed(25)}>Speed of Light 25</button>
+          </div>
+          <Code obj={{ speed }} />
+        </div>
+        <br />
+        <div>
+          <button onClick={() => (wallHack.value = !wallHack.value)}>
+            Toggle Wallhack
+          </button>
+          <Code obj={{ wallHack }} />
+        </div>
+        <div>
+          <button
+            onClick={() => (activePlayerTwo.value = !activePlayerTwo.value)}
+          >
+            Toggle SecondPlayer
+          </button>
+          <Code obj={{ activePlayerTwo }} />
+        </div>
       </div>
     </div>
   );

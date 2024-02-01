@@ -116,5 +116,6 @@ export const SnakeSegmentStyle = ({ position, belly }: SnakeSegmentProps) => {
     margin: '1px',
     position: 'absolute',
   };
+
   return <div style={match ? endureStyle : style} />;
 };
