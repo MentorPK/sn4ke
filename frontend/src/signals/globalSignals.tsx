@@ -30,6 +30,8 @@ const speed = signal(500);
 const wallHack = signal<boolean>(false);
 const activePlayerTwo = signal<boolean>(false);
 const startGame = signal<boolean>(false);
+const directionOne = signal<number>(generateRandomNumber(3));
+
 export {
   wallHack,
   foodPosition,
@@ -43,4 +45,5 @@ export {
   snakeBellyTwo,
   activePlayerTwo,
   startGame,
+  directionOne,
 };

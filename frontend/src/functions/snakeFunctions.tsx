@@ -162,7 +162,6 @@ const triggerBotDirection = (
   food: Signal<Position>,
   triggerdDirection: Signal<boolean>
 ): TriggerDirection => {
-  console.log(direction.value, 'dire');
   triggerdDirection.value = true;
   const headFacesFood = isHeadFacingFood(snakeHead, direction, food);
   const difX = snakeHead.value.x - food.value.x;

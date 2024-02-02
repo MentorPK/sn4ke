@@ -8,6 +8,9 @@ export type Position = {
 type SnakeSegmentProps = {
   position: Position;
   belly: Position[];
+  segments: Position[];
+  snakeHead: Position;
+  idx: number;
 };
 type SnakeHeadStyleProps = {
   position: Position;
@@ -15,13 +18,10 @@ type SnakeHeadStyleProps = {
   direction: number;
 };
 
-const checkIfBellyFoodMatchesSnakeSegment = (
-  position: Position,
-  belly: Position[]
-) => {
+const checkIfArrayMatchesPosition = (position: Position, arr: Position[]) => {
   let match = false;
-  if (belly.length > 0) {
-    belly.forEach((item) => {
+  if (arr.length > 0) {
+    arr.forEach((item) => {
       if (item.x === position.x && item.y === position.y) {
         match = true;
       }
@@ -35,7 +35,7 @@ export const SnakeHeadStyle = ({
   belly,
   direction,
 }: SnakeHeadStyleProps) => {
-  const match = checkIfBellyFoodMatchesSnakeSegment(position, belly);
+  const match = checkIfArrayMatchesPosition(position, belly);
 
   const x = position.x * 30;
   const y = position.y * 30;
@@ -90,32 +90,81 @@ export const SnakeHeadStyle = ({
   );
 };
 
-export const SnakeSegmentStyle = ({ position, belly }: SnakeSegmentProps) => {
-  const match = checkIfBellyFoodMatchesSnakeSegment(position, belly);
+export const SnakeSegmentStyle = ({
+  position,
+  belly,
+  segments,
+  idx,
+  snakeHead,
+}: SnakeSegmentProps) => {
+  const matchBellyPosition = checkIfArrayMatchesPosition(position, belly);
   const x = position.x * 30;
   const y = position.y * 30;
+  let corner = '';
+  if (idx !== 0 && idx !== segments.length - 1) {
+    if (
+      (position.y < segments[idx - 1].y && position.x < segments[idx + 1].x) ||
+      (position.y < segments[idx + 1].y && position.x < segments[idx - 1].x)
+    ) {
+      corner = 'bl';
+    } else if (
+      (position.y < segments[idx + 1].y && position.x > segments[idx - 1].x) ||
+      (position.y < segments[idx - 1].y && position.x > segments[idx + 1].x)
+    ) {
+      corner = 'br';
+    } else if (
+      (position.y > segments[idx + 1].y && position.x < segments[idx - 1].x) ||
+      (position.y > segments[idx - 1].y && position.x < segments[idx + 1].x)
+    ) {
+      corner = 'tl';
+    } else if (
+      (position.y > segments[idx - 1].y && position.x > segments[idx + 1].x) ||
+      (position.y > segments[idx + 1].y && position.x > segments[idx - 1].x)
+    ) {
+      corner = 'tr';
+    }
+  } else if (idx === 0) {
+    if (
+      (position.y < snakeHead.y && position.x < segments[idx + 1].x) ||
+      (position.y < segments[idx + 1].y && position.x < snakeHead.x)
+    ) {
+      corner = 'bl';
+    } else if (
+      (position.y < segments[idx + 1].y && position.x > snakeHead.x) ||
+      (position.y < snakeHead.y && position.x > segments[idx + 1].x)
+    ) {
+      corner = 'br';
+    } else if (
+      (position.y > segments[idx + 1].y && position.x < snakeHead.x) ||
+      (position.y > snakeHead.y && position.x < segments[idx + 1].x)
+    ) {
+      corner = 'tl';
+    } else if (
+      (position.y > snakeHead.y && position.x > segments[idx + 1].x) ||
+      (position.y > segments[idx + 1].y && position.x > snakeHead.x)
+    ) {
+      corner = 'tr';
+    }
+  }
 
-  const endureStyle = {
-    left: `${x}px`,
-    bottom: `${y}px`,
-    background: '#3C0000',
-    width: '24px',
-    height: '24px',
-    border: '2px solid #253d25',
-    margin: '1px',
-    position: 'absolute',
+  const cornerRadius = {
+    borderTopLeftRadius: corner === 'tl' ? '75%' : '0px',
+    borderTopRightRadius: corner === 'tr' ? '75%' : '0px',
+    borderBottomLeftRadius: corner === 'bl' ? '75%' : '0px',
+    borderBottomRightRadius: corner === 'br' ? '75%' : '0px',
   };
 
   const style = {
     left: `${x}px`,
     bottom: `${y}px`,
-    background: '#326432',
+    background: matchBellyPosition ? '#3C0000' : '#326432',
     width: '24px',
     height: '24px',
     border: '2px solid #253d25',
     margin: '1px',
     position: 'absolute',
+    ...cornerRadius,
   };
 
-  return <div style={match ? endureStyle : style} />;
+  return <div style={style} />;
 };

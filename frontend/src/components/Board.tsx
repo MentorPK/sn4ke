@@ -11,7 +11,7 @@ const boardStyle = {
   height: `${BOARD_DIMENSION}px`,
   background: '#9bb914',
   position: 'relative',
-  border: '2px solid green',
+  border: '12px solid green',
   borderRadius: '2%',
 };
 

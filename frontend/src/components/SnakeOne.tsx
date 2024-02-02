@@ -10,17 +10,16 @@ import {
   snakeBellyOne,
   wallHack,
   startGame,
+  directionOne,
 } from '../signals/globalSignals';
 import {
   eatFood,
-  generateRandomNumber,
   respawmSnake,
   startMoving,
 } from '../functions/snakeFunctions';
 
 const Snake = () => {
   //direction starts on 12 oclock with 0 top 1 on 3 oclock, 2 on 6, 3 on 9
-  const direction = useSignal<number>(generateRandomNumber(3));
   const triggerdDirection = useSignal<boolean>(false);
   const foodMatchesLastSegment = useSignal<boolean>(false);
 
@@ -50,26 +49,26 @@ const Snake = () => {
       switch (e.key) {
         case 'w':
         case 'ArrowUp':
-          if (direction.value !== 2) {
-            direction.value = 0;
+          if (directionOne.value !== 2) {
+            directionOne.value = 0;
           }
           break;
         case 's':
         case 'ArrowDown':
-          if (direction.value !== 0) {
-            direction.value = 2;
+          if (directionOne.value !== 0) {
+            directionOne.value = 2;
           }
           break;
         case 'a':
         case 'ArrowLeft':
-          if (direction.value !== 1) {
-            direction.value = 3;
+          if (directionOne.value !== 1) {
+            directionOne.value = 3;
           }
           break;
         case 'd':
         case 'ArrowRight':
-          if (direction.value !== 3) {
-            direction.value = 1;
+          if (directionOne.value !== 3) {
+            directionOne.value = 1;
           }
           break;
         default:
@@ -88,7 +87,7 @@ const Snake = () => {
   }, [snakeHeadOne.value]);
 
   useEffect(() => {
-    respawmSnake(snakeSegmentsOne, snakeHeadOne, direction);
+    respawmSnake(snakeSegmentsOne, snakeHeadOne, directionOne);
   }, []);
 
   useEffect(() => {
@@ -107,7 +106,7 @@ const Snake = () => {
         snakeHead: snakeHeadOne,
         snakeSegments: snakeSegmentsOne,
         snakeBelly: snakeBellyOne,
-        direction: direction,
+        direction: directionOne,
         triggerdDirection: triggerdDirection,
         wallHack: wallHack,
         foodMatchesLastSegment: foodMatchesLastSegment,
@@ -124,12 +123,15 @@ const Snake = () => {
       <SnakeHeadStyle
         position={snakeHeadOne.value}
         belly={snakeBellyOne.value}
-        direction={direction.value}
+        direction={directionOne.value}
       />
-      {snakeSegmentsOne.value.map((segment, idx) => (
+      {snakeSegmentsOne.value.map((segment, idx, arr) => (
         <SnakeSegmentStyle
           position={segment}
+          idx={idx}
+          segments={arr}
           belly={snakeBellyOne.value}
+          snakeHead={snakeHeadOne.value}
           key={idx}
         />
       ))}

@@ -43,8 +43,10 @@ const Options = () => {
           <Code obj={{ startGame }} />
         </div>
         <div>
-          <button onClick={() => (activePlayerTwo.value = true)}>
-            Activate Player 2 (PC)
+          <button
+            onClick={() => (activePlayerTwo.value = !activePlayerTwo.value)}
+          >
+            Toggle SecondPlayer
           </button>
           <Code obj={{ activePlayerTwo }} />
         </div>
@@ -73,14 +75,6 @@ const Options = () => {
             Toggle Wallhack
           </button>
           <Code obj={{ wallHack }} />
-        </div>
-        <div>
-          <button
-            onClick={() => (activePlayerTwo.value = !activePlayerTwo.value)}
-          >
-            Toggle SecondPlayer
-          </button>
-          <Code obj={{ activePlayerTwo }} />
         </div>
       </div>
     </div>

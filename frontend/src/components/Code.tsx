@@ -1,4 +1,3 @@
-import { ReactNode } from 'preact/compat';
 type Code = {
   obj: any;
 };
