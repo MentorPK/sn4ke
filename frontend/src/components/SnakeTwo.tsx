@@ -16,7 +16,7 @@ import {
   respawmSnake,
   startMoving,
 } from '../functions/snakeFunctions';
-import { effect, useSignal } from '@preact/signals';
+import { useSignal } from '@preact/signals';
 
 const SnakeTwo = () => {
   //direction need to be thought of cause it will be genrated by the PC
@@ -24,7 +24,7 @@ const SnakeTwo = () => {
   const foodMatchesLastSegment = useSignal<boolean>(false);
   const triggerdDirection = useSignal<boolean>(false);
 
-  const isHeadEatingSegment = () => {
+  /*   const isHeadEatingSegment = () => {
     const eaten = snakeSegmentsTwo.value.some(
       (segment) =>
         segment.x === snakeHeadTwo.value.x && segment.y === snakeHeadTwo.value.y
@@ -32,7 +32,7 @@ const SnakeTwo = () => {
     if (eaten) {
       isGameOver.value = true;
     }
-  };
+  }; */
 
   useEffect(() => {
     let movingInterval: number | undefined;
@@ -70,10 +70,13 @@ const SnakeTwo = () => {
         belly={snakeBellyTwo.value}
         direction={direction.value}
       />
-      {snakeSegmentsTwo.value.map((segment, idx) => (
+      {snakeSegmentsTwo.value.map((segment, idx, arr) => (
         <SnakeSegmentStyle
           position={segment}
+          idx={idx}
+          segments={arr}
           belly={snakeBellyTwo.value}
+          snakeHead={snakeHeadTwo.value}
           key={idx}
         />
       ))}
