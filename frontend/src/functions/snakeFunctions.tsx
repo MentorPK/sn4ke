@@ -200,6 +200,7 @@ const triggerBotDirection = (
       direction.value = 1;
       return { offset: 1, axis: 'x' }; // Move right
     }
+  } else {
   }
 };
 
@@ -306,8 +307,6 @@ type StartMoveOptions =
       wallHack: Signal<boolean>;
       foodMatchesLastSegment: Signal<boolean>;
       speed: Signal<number>;
-      isBot?: false;
-      food?: never;
     };
 
 export const startMoving = (options: StartMoveOptions): number => {

@@ -6,16 +6,20 @@ import SnakeOne from '../../components/SnakeOne';
 import Options from '../../components/Options';
 import { isGameOver, activePlayerTwo } from '../../signals/globalSignals';
 import SnakeTwo from '../../components/SnakeTwo';
+import { signal } from '@preact/signals';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export const Home = () => {
   // Create a signal for the WebSocket
-  //const socket = signal(null);
-  //socket.value = initializeWebSocket();
+  const socket = signal<ReconnectingWebSocket | null>(null);
+  socket.value = initializeWebSocket();
 
-  //const sendMessage = () => {
-  //  const message = 'This is a message from Client to Server';
-  //  socket.value.send(message);
-  //};
+  const sendMessage = () => {
+    const message = 'This is a message from Client to Server';
+    socket.value.send(message);
+  };
+
+  sendMessage();
 
   return (
     <div style={{ display: 'flex', gap: '100px' }}>
