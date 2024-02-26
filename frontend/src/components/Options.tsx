@@ -1,4 +1,4 @@
-import { computed, useSignal } from '@preact/signals';
+import { computed, effect, useSignal } from '@preact/signals';
 import {
   speed,
   snakeSegmentsOne,
@@ -7,6 +7,7 @@ import {
   activePlayerTwo,
   startGame,
   triggerdDirectionKeys,
+  playerName,
 } from '../signals/globalSignals';
 import Code from './Code';
 const Options = () => {
@@ -17,18 +18,21 @@ const Options = () => {
   const setSpeed = (value: number) => {
     speed.value = value;
   };
-
   const isSettingOpen = useSignal(true);
+
+  const handleChange = (e: Event) => {
+    setTimeout(() => {
+      playerName.value = e.target.value;
+    }, 250);
+  };
 
   return (
     <div
       style={{
         borderLeft: '8px solid #5E0035',
-        right: 0,
         backgroundColor: '#0A100D',
-        width: `${isSettingOpen.value ? '100%' : '0'}`,
-        transition: 'width 0.5s',
-        maxWidth: '512px',
+        width: `${isSettingOpen.value ? '512px' : '0'}`,
+        transition: 'width 0.25s ease-in-out',
         overflow: 'hidden',
       }}
     >
@@ -41,6 +45,8 @@ const Options = () => {
           width: '32px',
           height: '64px',
           backgroundColor: '#5E0035',
+          borderTop: '2px solid #5E0035',
+          borderLeft: '2px solid #5E0035',
           borderRadius: '100px 0 0 100px',
           display: 'flex',
           justifyContent: 'center',
@@ -66,7 +72,7 @@ const Options = () => {
             flexDirection: 'column',
           }}
         >
-          <h1>Options</h1>
+          <h1 style={{ alignSelf: 'center' }}>Options</h1>
           <div>
             <button onClick={() => (startGame.value = !startGame.value)}>
               Toggle Start Game
@@ -83,7 +89,7 @@ const Options = () => {
               }}
             >
               <label for="playerName">Name:</label>
-              <input name="playerName" type="text" />
+              <input name="playerName" type="text" onChange={handleChange} />
             </div>
           </div>
           <div>

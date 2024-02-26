@@ -32,7 +32,7 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        fmt.Printf("Received message from client: %s\n", string(p))
+        fmt.Printf("Received data: %s\n", string(p))
 
         if err := conn.WriteMessage(messageType, p); err != nil {
             return

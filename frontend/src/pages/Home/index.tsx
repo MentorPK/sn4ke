@@ -7,6 +7,7 @@ import {
   isGameOver,
   activePlayerTwo,
   triggerdDirectionKeys,
+  playerName,
 } from '../../signals/globalSignals';
 import SnakeTwo from '../../components/SnakeTwo';
 import { signal } from '@preact/signals';
@@ -14,17 +15,22 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import DirectionKeys from '../../components/DirectionKeys';
 import Options from '../../components/Options';
 
+const DTO = {
+  playerName: playerName.value,
+};
+
 export const Home = () => {
   // Create a signal for the WebSocket
-  const socket = signal<ReconnectingWebSocket | null>(null);
-  socket.value = initializeWebSocket();
+  const socket = initializeWebSocket();
 
-  const sendMessage = () => {
-    const message = 'This is a message from Client to Server';
-    socket.value.send(message);
+  const sendData = () => {
+    const message = 'send data';
+
+    socket.send(JSON.stringify(DTO));
   };
-
-  sendMessage();
+  if (DTO.playerName) {
+    sendData();
+  }
 
   return (
     <div style={{ display: 'flex' }}>
