@@ -31,6 +31,7 @@ const wallHack = signal<boolean>(false);
 const activePlayerTwo = signal<boolean>(false);
 const startGame = signal<boolean>(false);
 const directionOne = signal<number>(generateRandomNumber(3));
+const triggerdDirectionKeys = signal(false);
 
 export {
   wallHack,
@@ -46,4 +47,5 @@ export {
   activePlayerTwo,
   startGame,
   directionOne,
+  triggerdDirectionKeys,
 };
